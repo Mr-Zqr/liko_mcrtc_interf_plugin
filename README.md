@@ -1,3 +1,6 @@
+![IMG_0422](https://github.com/Mr-Zqr/liko_mcrtc_interf_plugin/assets/62141613/f479d5d4-598f-4bc5-b54b-9a975db1e4c4)
+
+
 mc_rtc new plugin template
 ==
 
