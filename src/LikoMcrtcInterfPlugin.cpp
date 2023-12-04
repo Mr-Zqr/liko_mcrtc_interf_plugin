@@ -46,6 +46,9 @@ void LikoMcrtcInterfPlugin::after(mc_control::MCGlobalController & controller)
   controller.controller().datastore().assign("orientation_torso", bitbot_orientation_torso);
   controller.controller().datastore().assign("position_torso", bitbot_position_torso);
   controller.controller().datastore().assign("velocity_torso", bitbot_velocity_torso);
+  // controller.controller().gui()->addElement({"LikoMcrtcInterfPlugin"}, mc_rtc::gui::Transform("Marker", [this]() {
+  //     return sva::PTransformd{bitbot_orientation_torso, bitbot_position_torso};
+  // }));
 }
 
 mc_control::GlobalPlugin::GlobalPluginConfiguration LikoMcrtcInterfPlugin::configuration()
