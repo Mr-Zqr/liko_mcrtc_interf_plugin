@@ -26,6 +26,7 @@ include_directories(
   ${EIGEN3_INCLUDE_DIR}
 )
 
+
   
 # Configure and install the plugin configuration
 configure_file(etc/LikoMcrtcInterfPlugin.in.yaml
@@ -39,7 +40,7 @@ set(plugin_HDR src/LikoMcrtcInterfPlugin.h)
 
 # The add_plugin macro is provided by mc_rtc
 add_plugin(LikoMcrtcInterfPlugin "${plugin_SRC}" "${plugin_HDR}")
-
+target_link_libraries(LikoMcrtcInterfPlugin PUBLIC mc_rtc::mc_rtc_ros)
 if(BUILD_TESTING)
   add_subdirectory(tests)
 endif()
