@@ -45,6 +45,7 @@ private:
   Eigen::Quaterniond bitbot_orientation_torso_;
   
   bool disp_liko_coordinate_ = false;
+  bool run_ = false;
 };
 
 } // namespace mc_plugin

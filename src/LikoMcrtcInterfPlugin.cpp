@@ -5,7 +5,10 @@
 namespace mc_plugin
 {
 
-LikoMcrtcInterfPlugin::~LikoMcrtcInterfPlugin() = default;
+LikoMcrtcInterfPlugin::~LikoMcrtcInterfPlugin()
+{
+  run_ = false;
+}
 
 void LikoMcrtcInterfPlugin::init(mc_control::MCGlobalController & controller, const mc_rtc::Configuration & config)
 {
@@ -19,12 +22,14 @@ void LikoMcrtcInterfPlugin::init(mc_control::MCGlobalController & controller, co
 
   config("show_coordinate", disp_liko_coordinate_);
 
+  run_ = true;
+
   update_thread_ = std::thread([this]() {
-  ros::Rate rate(5000);
-  while(ros::ok())
-  {
-    ros::spinOnce();  
-  }
+    ros::Rate rate(5000);
+    while(ros::ok() && run_)
+    {
+      ros::spinOnce();  
+    }
   });
 }
 
