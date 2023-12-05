@@ -19,7 +19,7 @@ struct LikoMcrtcInterfPlugin : public mc_control::GlobalPlugin
 
   void reset(mc_control::MCGlobalController & controller) override;
 
-  void before(mc_control::MCGlobalController &) override;
+  void before(mc_control::MCGlobalController & controller) override;
 
   void after(mc_control::MCGlobalController & controller) override;
 
@@ -41,9 +41,10 @@ private:
   std::mutex update_mutex_;
 
   std::shared_ptr<ros::NodeHandle> nh_ = mc_rtc::ROSBridge::get_node_handle();
-  Eigen::Vector3d bitbot_position_torso, bitbot_velocity_torso;
-  Eigen::Quaterniond bitbot_orientation_torso;
+  Eigen::Vector3d bitbot_position_torso_, bitbot_velocity_torso_;
+  Eigen::Quaterniond bitbot_orientation_torso_;
   
+  bool disp_liko_coordinate_ = false;
 };
 
 } // namespace mc_plugin
