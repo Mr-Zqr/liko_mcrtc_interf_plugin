@@ -13,11 +13,9 @@ LikoMcrtcInterfPlugin::~LikoMcrtcInterfPlugin()
 void LikoMcrtcInterfPlugin::init(mc_control::MCGlobalController & controller, const mc_rtc::Configuration & config)
 {
   mc_rtc::log::info("LikoMcrtcInterfPlugin::init called with configuration:\n{}", config.dump(true, true));
-  // ros::NodeHandle this_nh;
-  // nh_ = &this_nh;
   liko_sub_ = nh_->subscribe<sensor_msgs::Imu>("/bitbot_se", 1, &LikoMcrtcInterfPlugin::liko_callback, this);
   controller.controller().datastore().make<Eigen::Vector3d>("orientation_torso", bitbot_orientation_torso_);
-  controller.controller().datastore().make<Eigen::Vector3d>("position_torso", bitbot_position_torso_);
+  controller.controller().datastore().make<Eigen::Vector3d>("position_torso", bitbot_position_torso_smoothed_);
   controller.controller().datastore().make<Eigen::Vector3d>("velocity_torso", bitbot_velocity_torso_);
 
   config("show_coordinate", disp_liko_coordinate_);
@@ -32,6 +30,10 @@ void LikoMcrtcInterfPlugin::init(mc_control::MCGlobalController & controller, co
               return sva::PTransformd{bitbot_orientationq_torso_.conjugate(), bitbot_position_torso_};
             }));
   }
+
+  LPFx.init(20, 0.001);
+  LPFy.init(20, 0.001);
+  LPFz.init(2, 0.001);
 
   run_ = true;
 
@@ -65,7 +67,7 @@ void LikoMcrtcInterfPlugin::after(mc_control::MCGlobalController & controller)
   // mc_rtc::log::info("LikoMcrtcInterfPlugin::after");
   std::unique_lock<std::mutex> lock(update_mutex_);
   controller.controller().datastore().assign("orientation_torso", bitbot_orientation_torso_);
-  controller.controller().datastore().assign("position_torso", bitbot_position_torso_);
+  controller.controller().datastore().assign("position_torso", bitbot_position_torso_smoothed_);
   controller.controller().datastore().assign("velocity_torso", bitbot_velocity_torso_);
 
   // 将bitbot_orientation_torso_转为四元数存到bitbot_orientationq_torso_'
@@ -100,6 +102,9 @@ void LikoMcrtcInterfPlugin::liko_callback(const sensor_msgs::Imu::ConstPtr & msg
       Eigen::Vector3d(msg->linear_acceleration.x, msg->linear_acceleration.y, msg->linear_acceleration.z);
   bitbot_velocity_torso_ = Eigen::Vector3d(msg->angular_velocity.x, msg->angular_velocity.y, msg->angular_velocity.z);
   bitbot_orientation_torso_ = Eigen::Vector3d(msg->orientation.x, msg->orientation.y, msg->orientation.z);
+  bitbot_position_torso_smoothed_[0] = LPFx.filter(bitbot_position_torso_[0]);
+  bitbot_position_torso_smoothed_[1] = LPFy.filter(bitbot_position_torso_[1]);
+  bitbot_position_torso_smoothed_[2] = LPFz.filter(bitbot_position_torso_[2]);
 }
 } // namespace mc_plugin
 

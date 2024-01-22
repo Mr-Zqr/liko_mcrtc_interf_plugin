@@ -10,6 +10,7 @@
 #include <sensor_msgs/Imu.h>
 #include <Eigen/Geometry>
 #include <ros/ros.h>
+#include "low_pass_filter.hpp"
 
 namespace mc_plugin
 {
@@ -42,11 +43,15 @@ private:
   std::mutex update_mutex_;
 
   std::shared_ptr<ros::NodeHandle> nh_ = mc_rtc::ROSBridge::get_node_handle();
-  Eigen::Vector3d bitbot_position_torso_, bitbot_velocity_torso_, bitbot_orientation_torso_;
+  Eigen::Vector3d bitbot_position_torso_, bitbot_position_torso_smoothed_, bitbot_velocity_torso_, bitbot_orientation_torso_;
   Eigen::Quaterniond bitbot_orientationq_torso_;
   
   bool disp_liko_coordinate_ = false;
   bool run_ = false;
+
+  LowPassFilter LPFx;
+  LowPassFilter LPFy;
+  LowPassFilter LPFz;
 };
 
 } // namespace mc_plugin
