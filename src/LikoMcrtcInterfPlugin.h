@@ -7,7 +7,8 @@
 #include <mc_control/GlobalPlugin.h>
 #include <mc_rtc/ros.h>
 #include <Eigen/Dense>
-#include <nav_msgs/Odometry.h>
+#include <sensor_msgs/Imu.h>
+#include <Eigen/Geometry>
 #include <ros/ros.h>
 
 namespace mc_plugin
@@ -31,7 +32,7 @@ struct LikoMcrtcInterfPlugin : public mc_control::GlobalPlugin
 private:
   
   ros::Subscriber liko_sub_;
-  void liko_callback(const nav_msgs::Odometry::ConstPtr & msg);
+  void liko_callback(const sensor_msgs::Imu::ConstPtr & msg);
 
   // Running thread
   std::atomic<bool> running_{false};
@@ -41,10 +42,11 @@ private:
   std::mutex update_mutex_;
 
   std::shared_ptr<ros::NodeHandle> nh_ = mc_rtc::ROSBridge::get_node_handle();
-  Eigen::Vector3d bitbot_position_torso_, bitbot_velocity_torso_;
-  Eigen::Quaterniond bitbot_orientation_torso_;
+  Eigen::Vector3d bitbot_position_torso_, bitbot_velocity_torso_, bitbot_orientation_torso_;
+  Eigen::Quaterniond bitbot_orientationq_torso_;
   
   bool disp_liko_coordinate_ = false;
+  bool run_ = false;
 };
 
 } // namespace mc_plugin
